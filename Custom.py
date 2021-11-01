@@ -53,7 +53,7 @@ train_generator = train_datagen.flow_from_directory(
     seed=42
 )
 
-valid_generator = train_datagen.flow_from_directory(
+valid_generator = test_datagen.flow_from_directory(
     directory=src_path_valid,
     target_size=(224, 224),
     color_mode="rgb",
@@ -79,23 +79,21 @@ def prepare_model():
 	model.add(Conv2D(16, kernel_size=(3, 3),activation='linear',padding='same',input_shape=(224,224,3)))
 	model.add(LeakyReLU(alpha=0.1))
 	model.add(MaxPooling2D((2, 2),padding='same'))
-#	model.add(Dropout(0.25))
 	model.add(Conv2D(32, kernel_size=(3, 3),activation='linear',padding='same'))
 	model.add(LeakyReLU(alpha=0.1))
 	model.add(MaxPooling2D((2, 2),padding='same'))
-#	model.add(Dropout(0.25))
 	model.add(Conv2D(64, (3, 3), activation='linear',padding='same'))
 	model.add(LeakyReLU(alpha=0.1))
 	model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
-#	model.add(Dropout(0.25))
 	model.add(Conv2D(128, (3, 3), activation='linear',padding='same'))
 	model.add(LeakyReLU(alpha=0.1))                  
 	model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
-#	model.add(Dropout(0.4))
 	model.add(Flatten())
 	model.add(Dense(128, activation='linear'))
 	model.add(LeakyReLU(alpha=0.1))           
-#	model.add(Dropout(0.3))
+	model.add(Dropout(0.3))
+	model.add(Dense(64, activation='relu'))
+	model.add(LeakyReLU(alpha=0.1))
 	model.add(Dense(num_classes, activation='softmax'))
 	model.compile(loss="categorical_crossentropy",optimizer=tf.optimizers.SGD(learning_rate=0.01),metrics=['accuracy'])
 	return model
@@ -104,7 +102,7 @@ model = prepare_model()
 hist = model.fit(train_generator,
                     validation_data = valid_generator,
                     steps_per_epoch = train_generator.n//train_generator.batch_size,
-                    epochs=5, callbacks=[cb])
+                    epochs=100, callbacks=[cb])
 
 print(cb.logs)
 print(sum(cb.logs))                    
@@ -114,12 +112,12 @@ print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
 model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
-    filepath='Customsgd0.01augnodrop2.h5',
+    filepath='Customsgd0.01augdrop4.h5',
     monitor='val_accuracy',
     mode='max',
     save_best_only=True)
     
-f = open('historycustomsgd0.01augnodrop2.pck', 'wb')
+f = open('historycustomsgd0.01augdrop4.pck', 'wb')
 pickle.dump(hist.history, f)
 f.close()
 
@@ -128,5 +126,6 @@ f.close()
 #history = pickle.load(f)
 #f.close()
 
-model.save("Customsgd0.01augnodrop2.h5")
+model.save("Customsgd0.01augdrop4.h5")
+
 
