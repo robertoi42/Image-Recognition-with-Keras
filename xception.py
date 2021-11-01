@@ -22,9 +22,9 @@ class TimingCallback(keras.callbacks.Callback):
         
 cb = TimingCallback()
 
-src_path_train = "data2/train/"
-src_path_test = "data2/test/"
-src_path_valid = "data2/valid/"
+src_path_train = "data/train/"
+src_path_test = "data/test/"
+src_path_valid = "data/valid/"
 num_classes = 7
 '''
 train_datagen = ImageDataGenerator(
