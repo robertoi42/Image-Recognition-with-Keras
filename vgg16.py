@@ -57,7 +57,7 @@ train_generator = train_datagen.flow_from_directory(
     seed=42
 )
 
-valid_generator = train_datagen.flow_from_directory(
+valid_generator = test_datagen.flow_from_directory(
     directory=src_path_valid,
     target_size=(224, 224),
     color_mode="rgb",
@@ -89,8 +89,9 @@ def prepare_model():
 
 	model.add(Dense(128, activation='relu'))
 	model.add(Dropout(0.3))
+	model.add(BatchNormalization())
 	model.add(Dense(64, activation='relu'))
-	
+
 	model.add(Dense(7, activation='softmax'))
 	model.compile(loss="categorical_crossentropy",optimizer=tf.optimizers.Adam(learning_rate=0.0001),metrics=['accuracy'])
 	return model
@@ -110,12 +111,12 @@ score = model.evaluate(test_generator)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
-f = open('historyvggAdam0.0001augdropout2.pck', 'wb')
+f = open('historyVgg16Adam0.0001noaugdroptest.pck', 'wb')
 pickle.dump(hist.history, f)
 f.close()
 
 model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
-    filepath='Vgg16Adam0.0001augdropout2.h5',
+    filepath='Vgg16Adam0.0001noaugdroptest.h5',
     monitor='val_accuracy',
     mode='max',
     save_best_only=True)
@@ -125,4 +126,4 @@ model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
 #history = pickle.load(f)
 #f.close()
 
-model.save("Vgg16Adam0.0001augdropout2.h5")
+model.save("Vgg16Adam0.0001noaugdroptest.h5")
