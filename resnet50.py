@@ -21,9 +21,9 @@ class TimingCallback(keras.callbacks.Callback):
         self.logs.append(timer()-self.starttime)
 
 cb = TimingCallback() 
-src_path_train = "data/train/"
-src_path_test = "data/test/"
-src_path_valid = "data/valid/"
+src_path_train = "data2/train/"
+src_path_test = "data2/test/"
+src_path_valid = "data2/valid/"
 num_classes = 7
 '''
 train_datagen = ImageDataGenerator(
@@ -128,5 +128,4 @@ model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
 #f.close()
 
 model.save("respadam0.00001augthisone.h5")
-
 

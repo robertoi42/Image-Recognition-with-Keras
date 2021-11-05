@@ -9,7 +9,11 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow import keras
 import pickle
 from timeit import default_timer as timer
-    
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
+                              patience=5, min_lr=0.00001)
+                              
 class TimingCallback(keras.callbacks.Callback):
     def __init__(self, logs={}):
         self.logs=[]
@@ -23,11 +27,11 @@ src_path_train = "data/train/"
 src_path_test = "data/test/"
 src_path_valid = "data/valid/"
 num_classes = 7
-'''
+'''  
 train_datagen = ImageDataGenerator(
         rescale=1 / 255.0)
-'''     
- 
+   
+''' 
 train_datagen = ImageDataGenerator(
         rescale=1 / 255.0,
         rotation_range=45,
@@ -91,18 +95,18 @@ def prepare_model():
 	model.add(Flatten())
 	model.add(Dense(128, activation='linear'))
 	model.add(LeakyReLU(alpha=0.1))           
-	model.add(Dropout(0.3))
+#	model.add(Dropout(0.3))
 	model.add(Dense(64, activation='relu'))
 	model.add(LeakyReLU(alpha=0.1))
 	model.add(Dense(num_classes, activation='softmax'))
-	model.compile(loss="categorical_crossentropy",optimizer=tf.optimizers.SGD(learning_rate=0.01),metrics=['accuracy'])
+	model.compile(loss="categorical_crossentropy",optimizer=tf.optimizers.Adam(learning_rate=0.001),metrics=['accuracy'])
 	return model
 
 model = prepare_model()
 hist = model.fit(train_generator,
                     validation_data = valid_generator,
                     steps_per_epoch = train_generator.n//train_generator.batch_size,
-                    epochs=100, callbacks=[cb])
+                    epochs=80, callbacks=[cb,reduce_lr])
 
 print(cb.logs)
 print(sum(cb.logs))                    
@@ -112,12 +116,12 @@ print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
 model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
-    filepath='Customsgd0.01augdrop4.h5',
+    filepath='Customadam0.001nothingtest8.h5',
     monitor='val_accuracy',
     mode='max',
     save_best_only=True)
     
-f = open('historycustomsgd0.01augdrop4.pck', 'wb')
+f = open('historyCustomadam0.001nothingtest8.pck', 'wb')
 pickle.dump(hist.history, f)
 f.close()
 
@@ -126,6 +130,5 @@ f.close()
 #history = pickle.load(f)
 #f.close()
 
-model.save("Customsgd0.01augdrop4.h5")
-
+model.save("Customadam0.001nothingtest8.h5")
 
